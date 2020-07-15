@@ -21,7 +21,6 @@ class NeuralNetwork:
     def __init__(self):
         self.neural_network = None
 
-
     def build_neural_network(self, *layers):
         """
         :param layers: separate layers (number of neurons in each layer
