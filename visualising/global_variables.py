@@ -1,6 +1,11 @@
 import pygame as pg
 
 
+def display_update(surface):
+    pg.display.update()
+    surface.fill((0, 0, 0))
+
+
 def events_handler(mouse=None):
     """
     This function handle all events in pygame
@@ -33,7 +38,7 @@ def events_handler(mouse=None):
 def render_text(surface, text, x, y, w, h, rect_col, text_col):
     pg.draw.rect(surface, rect_col, (x, y, w, h))
     if len(text) == 0:
-        return
+        return surface
     font_size = int(w // len(text))
     my_font = pg.font.SysFont("Calibri", font_size)
     my_text = my_font.render(text, 1, text_col)
@@ -44,7 +49,7 @@ def render_text(surface, text, x, y, w, h, rect_col, text_col):
 
 class Button:
     def __init__(self, x=0, y=0, w=100, h=100, a_col=(150, 150, 150),
-                 i_col=(100, 100, 100), text_col=(0, 0, 0), text='', action=None):
+                 i_col=(100, 100, 100), text_col=(0, 0, 0), text='', action=None, var=None):
         self.x = x
         self.y = y
         self.w = w
@@ -54,6 +59,7 @@ class Button:
         self.text_col = text_col
         self.text = text
         self.action = action
+        self.var = var
 
     def check_mouse_position(self, mouse):
         if (self.x <= mouse[0] <= self.x+self.w) and (self.y <= mouse[1] <= self.y+self.h):
@@ -62,21 +68,21 @@ class Button:
     def functionality(self, mouse_on_click):
         if self.check_mouse_position(mouse_on_click[0]):
             if (mouse_on_click[1] == 1) and (self.action is not None):
-                self.action()
-
+                self.var = self.action(self.var)
 
     def render_itself(self, surface, mouse, mouse_on_click):
         self.surface = surface
         if self.check_mouse_position(mouse):
-            render_text(self.surface, self.text, self.x, self.y, self.w, self.h, self.a_col, self.text_col)
+            self.surface = render_text(self.surface, self.text, self.x, self.y, self.w, self.h, self.a_col, self.text_col)
         else:
-            render_text(self.surface, self.text, self.x, self.y, self.w, self.h, self.i_col, self.text_col)
+            self.surface = render_text(self.surface, self.text, self.x, self.y, self.w, self.h, self.i_col, self.text_col)
         self.functionality(mouse_on_click)
-        return self.surface
+        return self.surface, self.var
 
 
 class InputPlace:
-    def __init__(self, x=0, y=0, w=100, h=100, col=(150, 150, 150), text_col=(0, 0, 0)):
+    def __init__(self, only_numbers=False, x=0, y=0, w=100, h=100, col=(150, 150, 150), text_col=(0, 0, 0)):
+        self.only_numbers = only_numbers
         self.x = x
         self.y = y
         self.w = w
@@ -85,7 +91,6 @@ class InputPlace:
         self.text_col = text_col
         self.text = ''
 
-
     def functionality(self, keys):
         for key in keys:
             if key == '\x08':
@@ -93,13 +98,16 @@ class InputPlace:
                 if len(self.text) == 0:
                     self.text = ''
                 continue
+            if self.only_numbers:
+                if key.isdigit():
+                    self.text += key
+                    continue
             self.text += key
-
 
     def render_itself(self, surface, keys):
         self.surface = surface
         self.functionality(keys)
-        render_text(self.surface, self.text, self.x, self.y, self.w, self.h, self.col, self.text_col)
+        self.suface = render_text(self.surface, self.text, self.x, self.y, self.w, self.h, self.col, self.text_col)
         return surface
 
     def get_result(self):
