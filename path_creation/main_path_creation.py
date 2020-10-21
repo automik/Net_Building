@@ -9,6 +9,13 @@ def distance(dot1, dot2):
     return dist
 
 
+def total_network_distance(dots):
+    lines = create_path(dots)
+    dist = 0
+    for line in lines:
+        dist += distance(line[0], line[1])
+    return dist
+
 def create_path(dots=None):
     connections = []
     if dots is None:
@@ -56,7 +63,7 @@ def create_path(dots=None):
             connections.append([dot, min_dot[0]])
 
         for dot in shteins_dots:
-            if dot[1] !=3:
+            if dot[1] != 3:
                 print('fuuuuuuuk')
 
     else:
@@ -66,7 +73,12 @@ def create_path(dots=None):
 
 if __name__ == '__main__':
     dots = {
-        'original': [[0,0], [100,100]],
-        'shteins': [[20,20]]
-    }
+                'original': [[80, 0], [80, 120], [40, 160], [120, 240], [200, 160]],
+                'shteins': [[0, 40], [160, 0], [200, 240]]
+            }
+    print(create_path(dots))
     lines = create_path(dots)
+    d = 0
+    for line in lines:
+        d += distance(line[0], line[1])
+    print(d, total_network_distance(dots))
